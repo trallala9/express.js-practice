@@ -13,6 +13,17 @@ var app = express();
 }
 app.use(logger);*/
 
+
+//7.Body parser Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+
+//put static resources into folder,set static path
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 //.5 set up route for "/" using get request.
 app.get("/", function (req, res) {
     res.send('Hello You');
