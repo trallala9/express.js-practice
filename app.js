@@ -2,7 +2,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path'); //we use to simplify path
-
+var expressValidator = require('express-validator');
 //initialize var app and set it to express function
 var app = express();
 
@@ -32,6 +32,53 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+//Global vars
+app.use(function (req, res, next) {
+    res.locals.errors = null;
+    next();
+});
+//Express Validator Middleware
+app.use(expressValidator({
+    errorFormatter: function (param, msg, value) {
+        var namespace = param.split('.'),
+            root = namespace.shift(),
+            formParam = root;
+        while (namespace.lenght) {
+            formParam += '[' + namespace.shift() + ']';
+        }
+        return {
+            param: formParam,
+            msg: msg,
+            value: value
+        };
+    }
+}));
+
+
+
+
+var users = [{
+        first_name: 'Jeff',
+        last_name: 'Doe',
+        email: 'Jeffdoe@gmail.com',
+},
+    {
+        first_name: 'Bill',
+        last_name: 'Doee',
+        email: 'Billdoee@gmail.com',
+},
+    {
+        first_name: 'Tom',
+        last_name: 'Doek',
+        email: 'Tomdoek@gmail.com',
+    },
+    {
+        first_name: 'Bill',
+        last_name: 'Doueg',
+        email: 'Billdoueg@gmail.com',
+},
+
+];
 /*//9.to parse j.son
 var people = [{
         name: 'Jeff',
@@ -62,7 +109,39 @@ app.get('/', function (req, res) {
     res.send('Hello');
 });*/
 app.get('/', function (req, res) {
-    res.render('index');
+    //we can parse values into the index view
+
+    res.render('index', {
+        title: 'Customers :',
+        users: users
+    });
+});
+app.post('/users/add', function (req, res) {
+
+    req.checkBody('first_name',
+        'First name is required').notEmpty();
+    req.checkBody('last_name',
+        'Last name is required').notEmpty();
+    req.checkBody('email',
+        'Email is required').notEmpty();
+
+    var errors = req.validationErrors();
+    if (errors) {
+        //console.log('ERRORS');
+        res.render('index', {
+            title: 'Customers :',
+            users: users,
+            errors: errors
+        });
+    } else {
+        var newUser = {
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            email: req.body.email
+
+        }
+        console.log('SUCCESS')
+    }
 });
 //4.we need to listen our app on port
 app.listen(3000, function () {
