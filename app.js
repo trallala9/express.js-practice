@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-//Global vars
+//set errors as a global variable
 app.use(function (req, res, next) {
     res.locals.errors = null;
     next();
@@ -43,6 +43,7 @@ app.use(expressValidator({
         var namespace = param.split('.'),
             root = namespace.shift(),
             formParam = root;
+
         while (namespace.lenght) {
             formParam += '[' + namespace.shift() + ']';
         }
@@ -58,21 +59,25 @@ app.use(expressValidator({
 
 
 var users = [{
+        id: 1,
         first_name: 'Jeff',
         last_name: 'Doe',
         email: 'Jeffdoe@gmail.com',
 },
     {
+        id: 2,
         first_name: 'Bill',
         last_name: 'Doee',
         email: 'Billdoee@gmail.com',
 },
     {
+        id: 3,
         first_name: 'Tom',
         last_name: 'Doek',
         email: 'Tomdoek@gmail.com',
     },
     {
+        id: 4,
         first_name: 'Bill',
         last_name: 'Doueg',
         email: 'Billdoueg@gmail.com',
@@ -131,7 +136,7 @@ app.post('/users/add', function (req, res) {
         res.render('index', {
             title: 'Customers :',
             users: users,
-            errors: errors
+            errors: errors,
         });
     } else {
         var newUser = {
